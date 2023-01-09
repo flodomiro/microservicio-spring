@@ -14,10 +14,26 @@ steps:
     javaHomeOption: 'JDKVersion'
     sonarQubeRunAnalysis: false
     spotBugsAnalysis: false
+  displayName: Build Proyecto
 
 - task: SonarCloudPrepare@1
   inputs:
     SonarCloud: 'devopsv3'
     organization: 'flodomiro'
     projectKey: 'flodomiro_microservicio-spring'
-    projectName: 'microservicio-spring'
+    projectName: 'microservicio-spring' 
+  displayName: Coneccion Sonar Cloud
+
+
+- task: Gradle@3
+  inputs:
+    gradleWrapperFile: 'gradlew'
+    tasks: 'sonarqube'
+    publishJUnitResults: true
+    testResultsFiles: '**/TEST-*.xml'
+    javaHomeOption: 'JDKVersion'
+    sonarQubeRunAnalysis: true
+    sqGradlePluginVersionChoice: 'specify'
+    sonarQubeGradlePluginVersion: '3.3'
+    spotBugsAnalysis: false
+  displayName: Analisys
