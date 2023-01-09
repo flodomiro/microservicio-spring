@@ -37,3 +37,17 @@ steps:
     sonarQubeGradlePluginVersion: '3.3'
     spotBugsAnalysis: false
   displayName: Analisys
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'devopsv3_2023'
+    command: 'login'
+  displayName: Coneccion a Docker
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'devopsv3_2023'
+    repository: 'alejandroaraya/devopsv3'
+    command: 'build'
+    Dockerfile: '**/Dockerfile'
+    tags: 'latest'
