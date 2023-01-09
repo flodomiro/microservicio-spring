@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: testing-web
-        image: luistrincado/devopsfinalv3:latest
+        image: alejandroaraya/devopsv3:latest
         ports:
         - containerPort: 8080
