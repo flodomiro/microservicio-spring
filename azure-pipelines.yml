@@ -3,6 +3,8 @@ trigger:
 
 pool: 'mac'
 
+steps:
+
 - task: Gradle@3
   inputs:
     gradleWrapperFile: 'gradlew'
