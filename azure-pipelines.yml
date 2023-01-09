@@ -51,3 +51,12 @@ steps:
     command: 'build'
     Dockerfile: '**/Dockerfile'
     tags: 'latest'
+  displayName: Docker File
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'devopsv3_2023'
+    repository: 'alejandroaraya/devopsv3'
+    command: 'push'
+    tags: 'latest'
+  displayName: Docker Push
