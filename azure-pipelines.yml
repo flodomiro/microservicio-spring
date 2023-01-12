@@ -16,6 +16,23 @@ steps:
     spotBugsAnalysis: false
   displayName: Build Proyecto
 
+#Análisis de código con JaCoco
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: 'JaCoCo'
+    summaryFileLocation: '$(Build.SourcesDirectory)/build/reports/jacoco/test/jacocoTestReport.xml'
+    reportDirectory: '$(Build.SourcesDirectory)/**/reports/jacoco/test/html'
+  displayName: Pruebas unitarias
+
+#Filtro de calidad de código
+- task: BuildQualityChecks@8
+  inputs:
+    checkCoverage: true
+    coverageFailOption: 'fixed'
+    coverageType: 'lines'
+    coverageThreshold: '85'
+  displayName: 'Cumplimiento de calidad'
+
 - task: SonarCloudPrepare@1
   inputs:
     SonarCloud: 'devopsv3'
