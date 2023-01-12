@@ -1,0 +1,98 @@
+trigger:
+- feature-ms-alejandroAraya-mensaje
+
+pool: 'mac'
+
+steps:
+
+- task: Gradle@3
+  inputs:
+    gradleWrapperFile: 'gradlew'
+    tasks: 'build'
+    publishJUnitResults: true
+    testResultsFiles: '**/TEST-*.xml'
+    javaHomeOption: 'JDKVersion'
+    sonarQubeRunAnalysis: false
+    spotBugsAnalysis: false
+  displayName: Build Proyecto
+
+#Análisis de código con JaCoco
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: 'JaCoCo'
+    summaryFileLocation: '$(Build.SourcesDirectory)/build/reports/jacoco/test/jacocoTestReport.xml'
+    reportDirectory: '$(Build.SourcesDirectory)/**/reports/jacoco/test/html'
+  displayName: Pruebas unitarias
+
+#Filtro de calidad de código
+- task: BuildQualityChecks@8
+  inputs:
+    checkCoverage: true
+    coverageFailOption: 'fixed'
+    coverageType: 'lines'
+    coverageThreshold: '85'
+  displayName: 'Cumplimiento de calidad'
+
+- task: SonarCloudPrepare@1
+  inputs:
+    SonarCloud: 'devopsv3'
+    organization: 'flodomiro'
+    projectKey: 'flodomiro_microservicio-spring'
+    projectName: 'microservicio-spring' 
+  displayName: Coneccion Sonar Cloud
+
+
+- task: Gradle@3
+  inputs:
+    gradleWrapperFile: 'gradlew'
+    tasks: 'sonarqube'
+    publishJUnitResults: true
+    testResultsFiles: '**/TEST-*.xml'
+    javaHomeOption: 'JDKVersion'
+    sonarQubeRunAnalysis: true
+    sqGradlePluginVersionChoice: 'specify'
+    sonarQubeGradlePluginVersion: '3.3'
+    spotBugsAnalysis: false
+  displayName: Analisys
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'devopsv3_2023'
+    command: 'login'
+  displayName: Coneccion a Docker
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'devopsv3_2023'
+    repository: 'alejandroaraya/devopsv3'
+    command: 'build'
+    Dockerfile: '**/Dockerfile'
+    tags: 'latest'
+  displayName: Docker File
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'devopsv3_2023'
+    repository: 'alejandroaraya/devopsv3'
+    command: 'push'
+    tags: 'latest'
+  displayName: Docker Push
+
+- task: Kubernetes@1
+  inputs:
+    connectionType: 'None'
+    namespace: 'default'
+    command: 'apply'
+    arguments: '-f deployment-app.yaml'
+    secretType: 'dockerRegistry'
+    containerRegistryType: 'Azure Container Registry'
+  displayName: Desplegar Kubernetes
+
+- task: Kubernetes@1
+  inputs:
+    connectionType: 'None'
+    command: 'expose'
+    arguments: 'deployment testing-web-deployment --type=NodePort --name=testing-web-expose'
+    secretType: 'dockerRegistry'
+    containerRegistryType: 'Azure Container Registry'
+  displayName: Servicio de Red Kubernetes
