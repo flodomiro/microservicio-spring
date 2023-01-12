@@ -43,5 +43,5 @@ jacocoTestReport {
 //					"com/example/testingweb/TestingWebApplication.class"
 //			])
 //		}))
-	}
+//	}
 }
